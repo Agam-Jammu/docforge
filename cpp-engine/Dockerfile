@@ -19,9 +19,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /src
 
-# Copy source files
-COPY CMakeLists.txt .
-COPY src/ src/
+# Copy source files (build context is the clearcapture/ root)
+COPY cpp-engine/CMakeLists.txt ./CMakeLists.txt
+COPY cpp-engine/src/ ./src/
 
 # Build
 RUN mkdir -p build && cd build && \

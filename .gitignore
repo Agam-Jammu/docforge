@@ -1,4 +1,6 @@
 build/
+bin/
+obj/
 *.o
 *.obj
 *.so
@@ -8,3 +10,16 @@ build/
 *.png
 *.jpg
 test_*
+*.deps.json
+*.runtimeconfig.json
+*.staticwebassets.*
+apphost
+*.cache
+*.pdb
+*.nupkg
+*.snk
+node_modules/
+__pycache__/
+*.pyc
+.env
+Uploads/
