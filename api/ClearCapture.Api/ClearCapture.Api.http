@@ -1,0 +1,6 @@
+@ClearCapture.Api_HostAddress = http://localhost:5178
+
+GET {{ClearCapture.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
