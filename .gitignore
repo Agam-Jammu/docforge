@@ -1,0 +1,10 @@
+build/
+*.o
+*.obj
+*.so
+*.dylib
+*.dll
+.DS_Store
+*.png
+*.jpg
+test_*
