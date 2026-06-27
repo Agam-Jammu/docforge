@@ -20,6 +20,9 @@ public class AppDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Filename).HasMaxLength(500).IsRequired();
             entity.Property(e => e.DocumentType).HasMaxLength(100);
+            entity.Property(e => e.Status)
+                  .HasConversion<string>()
+                  .HasMaxLength(20);
             entity.HasIndex(e => e.Status).HasFilter("\"Status\" = 'Pending'");
         });
 
