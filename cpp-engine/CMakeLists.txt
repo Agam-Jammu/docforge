@@ -9,7 +9,7 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(TESSERACT REQUIRED IMPORTED_TARGET tesseract)
-pkg_check_modules(POPPLER REQUIRED IMPORTED_TARGET poppler)
+pkg_check_modules(POPPLER REQUIRED IMPORTED_TARGET poppler-cpp)
 
 # Source files
 set(SOURCES
