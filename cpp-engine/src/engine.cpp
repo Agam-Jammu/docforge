@@ -38,7 +38,7 @@ bool initialize_engine(const std::string& tessdata_path) {
     }
 }
 
-Result<DocumentResult> process_document(const std::string& filepath) {
+Result<DocumentResult> process_document(const std::string& filepath, const std::string& document_type) {
     if (!g_ocr_engine || !g_extractor || !g_image_processor) {
         return Result<DocumentResult>("engine not initialized — call initialize_engine() first");
     }
@@ -66,16 +66,38 @@ Result<DocumentResult> process_document(const std::string& filepath) {
     }
 
     // Step 4: Rule-based extraction (Strategy A)
-    auto fields = g_extractor->extract_with_boxes(
-        ocr_result->text,
-        ocr_result->symbols,
-        "invoice"  // TODO: receive classified document type from API layer
-    );
+    // If document_type is "unknown", auto-detect by trying all rule sets
+    // and picking the one with the most extracted fields.
+    std::string detected_type = document_type;
+    std::vector<ExtractedField> fields;
+
+    if (document_type == "unknown") {
+        const auto& builtin = RuleExtractor::builtin_rules();
+        size_t best_count = 0;
+        std::string best_type = "unknown";
+
+        for (const auto& [type, _] : builtin) {
+            auto candidate = g_extractor->extract_with_boxes(
+                ocr_result->text, ocr_result->symbols, type);
+            if (candidate.size() > best_count) {
+                best_count = candidate.size();
+                best_type = type;
+                fields = std::move(candidate);
+            }
+        }
+
+        std::cout << std::format("[Classify] Auto-detected type: {} ({} fields)\n",
+                                 best_type, best_count);
+        detected_type = best_type;
+    } else {
+        fields = g_extractor->extract_with_boxes(
+            ocr_result->text, ocr_result->symbols, document_type);
+    }
 
     // Build document result
     DocumentResult result;
     result.filename = path.filename().string();
-    result.document_type = "invoice";
+    result.document_type = detected_type;
     result.confidence = g_ocr_engine->mean_confidence();
     result.fields = std::move(fields);
     result.raw_text = std::move(ocr_result->text);

@@ -14,7 +14,7 @@ bool initialize_engine(const std::string& tessdata_path = "");
 /**
  * @brief Process a single document through the full pipeline.
  */
-Result<DocumentResult> process_document(const std::string& filepath);
+Result<DocumentResult> process_document(const std::string& filepath, const std::string& document_type = "invoice");
 
 /**
  * @brief Shutdown the engine and release all resources.
