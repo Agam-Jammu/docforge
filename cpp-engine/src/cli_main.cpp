@@ -18,8 +18,17 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 2) {
-        std::cerr << std::format("Usage: {} <document1> [document2 ...]\n", argv[0]);
+        std::cerr << std::format("Usage: {} [--type <doc_type>] <document1> [document2 ...]\n", argv[0]);
         return 1;
+    }
+
+    std::string document_type = "invoice";
+    int file_start = 1;
+
+    // Parse optional --type argument
+    if (argc >= 4 && std::string(argv[1]) == "--type") {
+        document_type = argv[2];
+        file_start = 3;
     }
 
     if (!clearcapture::initialize_engine()) {
@@ -28,13 +37,13 @@ int main(int argc, char* argv[]) {
     }
 
     std::vector<std::string> files;
-    for (int i = 1; i < argc; ++i) {
+    for (int i = file_start; i < argc; ++i) {
         files.push_back(argv[i]);
     }
 
     std::cout << "[\n";
     for (size_t i = 0; i < files.size(); ++i) {
-        auto result = clearcapture::process_document(files[i]);
+        auto result = clearcapture::process_document(files[i], document_type);
         if (result.ok) {
             std::cout << "  " << result.value.to_json();
         } else {
