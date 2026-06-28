@@ -11,6 +11,13 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // C++ Engine (P/Invoke) — singleton because it manages native resources
 builder.Services.AddSingleton<CppEngineService>();
 
+// ML Classifier client — calls the Python FastAPI service
+builder.Services.AddHttpClient<ClassifierService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ClassifierUrl"] ?? "http://localhost:8000");
+    client.Timeout = TimeSpan.FromSeconds(10);
+});
+
 // Background document processing service
 builder.Services.AddHostedService<DocumentProcessingService>();
 
