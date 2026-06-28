@@ -51,7 +51,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libopencv-imgproc406t64 \
     libopencv-imgcodecs406t64 \
     libpoppler-cpp0t64 \
-    libpoppler146t64 \
+    libpoppler134 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
