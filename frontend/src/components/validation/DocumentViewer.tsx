@@ -20,9 +20,9 @@ export default function DocumentViewer({
 }: DocumentViewerProps) {
   const [imgError, setImgError] = useState(false);
 
-  // Try to load the document image from the API
-  // The API serves uploaded files from Uploads/ directory
-  const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+  // The API serves uploaded files from the /uploads/ endpoint.
+  // This is a raw static files endpoint, NOT under /api/.
+  const apiBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/api$/, "") || "http://localhost:5178";
   // Use storedFilename (with UUID prefix) or fall back to original filename
   const imageUrl = `${apiBase}/uploads/${storedFilename || filename}`;
 
