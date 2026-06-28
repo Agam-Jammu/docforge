@@ -22,7 +22,7 @@ export default function Sidebar() {
             <FileText className="h-4 w-4 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-semibold text-lg leading-tight">ClearCapture</h1>
+            <h1 className="font-semibold text-lg leading-tight">DocForge</h1>
             <p className="text-xs text-muted-foreground">Document Pipeline</p>
           </div>
         </Link>

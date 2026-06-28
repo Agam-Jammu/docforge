@@ -1,4 +1,4 @@
-namespace ClearCapture.Api.Models;
+namespace DocForge.Api.Models;
 
 public enum DocumentStatus
 {

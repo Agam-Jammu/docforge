@@ -1,9 +1,9 @@
-using ClearCapture.Api.Data;
-using ClearCapture.Api.Models;
+using DocForge.Api.Data;
+using DocForge.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
-namespace ClearCapture.Api.Services;
+namespace DocForge.Api.Services;
 
 /// <summary>
 /// Background service that polls for pending documents and processes them

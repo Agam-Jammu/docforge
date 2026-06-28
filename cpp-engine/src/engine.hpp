@@ -3,7 +3,7 @@
 #include "extraction/extracted_field.hpp"
 #include "ingestion/file_loader.hpp"
 
-namespace clearcapture {
+namespace docforge {
 
 /**
  * @brief Initialize the capture engine.
@@ -21,4 +21,4 @@ Result<DocumentResult> process_document(const std::string& filepath, const std::
  */
 void shutdown_engine();
 
-} // namespace clearcapture
+} // namespace docforge

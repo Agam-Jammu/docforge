@@ -8,7 +8,7 @@
 #include <format>
 #include <memory>
 
-namespace clearcapture {
+namespace docforge {
 
 namespace fs = std::filesystem;
 
@@ -94,4 +94,4 @@ private:
     static const std::vector<std::string> extensions_;
 };
 
-} // namespace clearcapture
+} // namespace docforge

@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /src
 
-# Copy source files (build context is the clearcapture/ root)
+# Copy source files (build context is the docforge/ root)
 COPY cpp-engine/CMakeLists.txt ./CMakeLists.txt
 COPY cpp-engine/src/ ./src/
 
@@ -46,11 +46,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /install/lib/libclearcapture_engine.so /usr/lib/
-COPY --from=builder /install/bin/clearcapture_cli /usr/local/bin/
+COPY --from=builder /install/lib/libdocforge_engine.so /usr/lib/
+COPY --from=builder /install/bin/docforge_cli /usr/local/bin/
 
 # Set Tesseract data path
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
 
-ENTRYPOINT ["clearcapture_cli"]
+ENTRYPOINT ["docforge_cli"]
 CMD ["--help"]

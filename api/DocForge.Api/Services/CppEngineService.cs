@@ -1,12 +1,12 @@
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace ClearCapture.Api.Services;
+namespace DocForge.Api.Services;
 
 /// <summary>
-/// Wrapper around the C++ ClearCapture CLI binary for OCR + field extraction.
+/// Wrapper around the C++ DocForge CLI binary for OCR + field extraction.
 /// The native P/Invoke path is preserved but falls back to shelling out
-/// to the compiled clearcapture_cli binary which works on macOS ARM64.
+/// to the compiled docforge_cli binary which works on macOS ARM64.
 /// </summary>
 public class CppEngineService : IDisposable
 {
@@ -20,11 +20,11 @@ public class CppEngineService : IDisposable
         // Look for the CLI binary relative to the API project directory or the repo root
         var possiblePaths = new[]
         {
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "cpp-engine", "build", "clearcapture_cli"),
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "cpp-engine", "build", "clearcapture_cli"),
-            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "cpp-engine", "build", "clearcapture_cli"),
-            "/Users/agamdeep/personal/projects/clearcapture/cpp-engine/build/clearcapture_cli",
-            "clearcapture_cli",
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "cpp-engine", "build", "docforge_cli"),
+            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "cpp-engine", "build", "docforge_cli"),
+            Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "cpp-engine", "build", "docforge_cli"),
+            "/Users/agamdeep/personal/projects/docforge/cpp-engine/build/docforge_cli",
+            "docforge_cli",
         };
 
         _cliPath = null!;

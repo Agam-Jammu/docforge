@@ -1,9 +1,9 @@
-using ClearCapture.Api.Data;
-using ClearCapture.Api.Models;
+using DocForge.Api.Data;
+using DocForge.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClearCapture.Api.Controllers;
+namespace DocForge.Api.Controllers;
 
 [ApiController]
 [Route("api/admin")]

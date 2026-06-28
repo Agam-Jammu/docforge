@@ -1,11 +1,11 @@
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using ClearCapture.Api.Data;
-using ClearCapture.Api.Models;
+using DocForge.Api.Data;
+using DocForge.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ClearCapture.Api.Services;
+namespace DocForge.Api.Services;
 
 /// <summary>
 /// Handles delivery of validated documents to configured export targets.

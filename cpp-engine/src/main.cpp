@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief ClearCapture C++20 Engine — Shared Library Entry Point.
+ * @brief DocForge C++20 Engine — Shared Library Entry Point.
  *
  * This is the primary interface for .NET Core P/Invoke integration.
  * Exports C-compatible functions that the .NET orchestrator calls.
@@ -21,20 +21,20 @@ extern "C" {
  * @brief Initialize the engine. Call once before any other function.
  * @return 0 on success, -1 on failure.
  */
-int CLEAR_Initialize(const char* tessdata_path) {
+int DOCFORGE_Initialize(const char* tessdata_path) {
     std::string path = tessdata_path ? std::string(tessdata_path) : "";
-    return clearcapture::initialize_engine(path) ? 0 : -1;
+    return docforge::initialize_engine(path) ? 0 : -1;
 }
 
 /**
  * @brief Process a document and return JSON result.
- * Caller must CLEAR_FreeString the returned string.
+ * Caller must DOCFORGE_FreeString the returned string.
  *
  * @param filepath Path to the document file.
  * @return JSON string with document result, or NULL on error.
  */
-char* CLEAR_ProcessDocument(const char* filepath) {
-    auto result = clearcapture::process_document(filepath);
+char* DOCFORGE_ProcessDocument(const char* filepath) {
+    auto result = docforge::process_document(filepath);
     if (!result.ok) {
         return nullptr;
     }
@@ -50,15 +50,15 @@ char* CLEAR_ProcessDocument(const char* filepath) {
 /**
  * @brief Free a string allocated by the engine.
  */
-void CLEAR_FreeString(char* str) {
+void DOCFORGE_FreeString(char* str) {
     std::free(str);
 }
 
 /**
  * @brief Shutdown the engine and release all resources.
  */
-void CLEAR_Shutdown() {
-    clearcapture::shutdown_engine();
+void DOCFORGE_Shutdown() {
+    docforge::shutdown_engine();
 }
 
 } // extern "C"

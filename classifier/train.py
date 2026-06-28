@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Training script for the ClearCapture document classifier.
+Training script for the DocForge document classifier.
 
 Usage:
     python train.py [--samples 500]

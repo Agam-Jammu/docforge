@@ -1,4 +1,4 @@
-namespace ClearCapture.Api.Models;
+namespace DocForge.Api.Models;
 
 /// <summary>
 /// Mock ERP/CRM table for the postgres_write export target.

@@ -10,7 +10,7 @@
 #include "extraction/extracted_field.hpp"
 #include "ingestion/file_loader.hpp"
 
-namespace clearcapture {
+namespace docforge {
 
 /**
  * @brief Result of OCR processing on a single page.
@@ -73,4 +73,4 @@ private:
     double mean_conf_ = 0.0;
 };
 
-} // namespace clearcapture
+} // namespace docforge

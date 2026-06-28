@@ -11,7 +11,7 @@
 #include <iostream>
 #include <system_error>
 
-namespace clearcapture {
+namespace docforge {
 
 // Supported file extensions
 const std::vector<std::string> FileLoader::extensions_ = {
@@ -136,4 +136,4 @@ const std::vector<std::string>& FileLoader::supported_extensions() {
     return extensions_;
 }
 
-} // namespace clearcapture
+} // namespace docforge

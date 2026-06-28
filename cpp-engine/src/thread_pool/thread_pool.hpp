@@ -13,7 +13,7 @@
 #include <thread>
 #include <vector>
 
-namespace clearcapture {
+namespace docforge {
 
 /**
  * @brief Concept constraining document processor types.
@@ -173,4 +173,4 @@ private:
     Processor processor_;
 };
 
-} // namespace clearcapture
+} // namespace docforge

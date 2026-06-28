@@ -3,7 +3,7 @@ import "./globals.css";
 import AppLayout from "@/components/layout/AppLayout";
 
 export const metadata: Metadata = {
-  title: "ClearCapture — Document Processing Pipeline",
+  title: "DocForge — Document Processing Pipeline",
   description:
     "Intelligent document capture pipeline: Capture -> Classify -> Extract -> Validate -> Export",
 };

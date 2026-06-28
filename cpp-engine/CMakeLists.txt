@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.28)
-project(clearcapture_engine VERSION 1.0.0 LANGUAGES CXX)
+project(docforge_engine VERSION 1.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -33,9 +33,9 @@ set(HEADERS
 )
 
 # Build shared library
-add_library(clearcapture_engine SHARED ${SOURCES} ${HEADERS})
+add_library(docforge_engine SHARED ${SOURCES} ${HEADERS})
 
-target_include_directories(clearcapture_engine
+target_include_directories(docforge_engine
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
     PRIVATE
@@ -44,23 +44,23 @@ target_include_directories(clearcapture_engine
         ${POPPLER_INCLUDE_DIRS}
 )
 
-target_link_libraries(clearcapture_engine
+target_link_libraries(docforge_engine
     PUBLIC
         ${OpenCV_LIBS}
         PkgConfig::TESSERACT
         PkgConfig::POPPLER
 )
 
-target_compile_features(clearcapture_engine PUBLIC cxx_std_20)
+target_compile_features(docforge_engine PUBLIC cxx_std_20)
 
 # Also build a CLI test runner
-add_executable(clearcapture_cli
+add_executable(docforge_cli
     src/cli_main.cpp
     ${SOURCES}
     ${HEADERS}
 )
 
-target_include_directories(clearcapture_cli
+target_include_directories(docforge_cli
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${OpenCV_INCLUDE_DIRS}
@@ -68,12 +68,12 @@ target_include_directories(clearcapture_cli
         ${POPPLER_INCLUDE_DIRS}
 )
 
-target_link_libraries(clearcapture_cli
+target_link_libraries(docforge_cli
     PRIVATE
         ${OpenCV_LIBS}
         PkgConfig::TESSERACT
         PkgConfig::POPPLER
 )
 
-install(TARGETS clearcapture_engine DESTINATION lib)
-install(FILES ${HEADERS} DESTINATION include/clearcapture)
+install(TARGETS docforge_engine DESTINATION lib)
+install(FILES ${HEADERS} DESTINATION include/docforge)

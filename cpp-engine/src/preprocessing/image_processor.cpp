@@ -8,7 +8,7 @@
 #include <numbers>
 #include <cmath>
 
-namespace clearcapture {
+namespace docforge {
 
 // Image Decoding
 
@@ -149,4 +149,4 @@ cv::Mat ImageProcessor::full_pipeline(const cv::Mat& input) {
     return scaled;
 }
 
-} // namespace clearcapture
+} // namespace docforge

@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ClearCapture.Api.Models;
+using DocForge.Api.Models;
 
-namespace ClearCapture.Api.Data;
+namespace DocForge.Api.Data;
 
 public class AppDbContext : DbContext
 {

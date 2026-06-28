@@ -1,5 +1,5 @@
 """
-ClearCapture Document Classifier — FastAPI microservice.
+DocForge Document Classifier — FastAPI microservice.
 
 Exposes a single classification endpoint used by the .NET Core orchestrator
 as part of the cascading recognition pipeline (Strategy A fallback).
@@ -20,7 +20,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 app = FastAPI(
-    title="ClearCapture Classifier",
+    title="DocForge Classifier",
     description="Document type classifier using TF-IDF + Logistic Regression",
     version="1.0.0",
 )

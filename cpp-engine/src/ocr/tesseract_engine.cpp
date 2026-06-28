@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <cstring>
 
-namespace clearcapture {
+namespace docforge {
 
 TesseractEngine::TesseractEngine(const std::string& language,
                                  const std::string& tessdata_path) {
@@ -135,4 +135,4 @@ Result<OCRResult> TesseractEngine::recognize_from_buffer(
     return recognize(img.data, img.cols, img.rows, 1);
 }
 
-} // namespace clearcapture
+} // namespace docforge

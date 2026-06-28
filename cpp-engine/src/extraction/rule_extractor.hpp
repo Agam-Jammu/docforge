@@ -9,7 +9,7 @@
 #include "extraction/extracted_field.hpp"
 #include "ocr/tesseract_engine.hpp"
 
-namespace clearcapture {
+namespace docforge {
 
 /**
  * @brief Extraction rule: a named field with a regex pattern and positional hint.
@@ -97,4 +97,4 @@ private:
     std::unordered_map<std::string, RuleSet> rules_;
 };
 
-} // namespace clearcapture
+} // namespace docforge

@@ -6,7 +6,7 @@
 #include "ingestion/file_loader.hpp"
 #include <opencv2/core.hpp>
 
-namespace clearcapture {
+namespace docforge {
 
 /**
  * @brief Image preprocessing pipeline using OpenCV.
@@ -73,4 +73,4 @@ private:
     [[nodiscard]] static double detect_skew_angle(const cv::Mat& binary);
 };
 
-} // namespace clearcapture
+} // namespace docforge

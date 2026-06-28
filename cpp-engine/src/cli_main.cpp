@@ -1,8 +1,8 @@
 /**
  * @file cli_main.cpp
- * @brief CLI test runner for the ClearCapture C++ engine.
+ * @brief CLI test runner for the DocForge C++ engine.
  *
- * Usage: clearcapture_cli <file1> [file2] ...
+ * Usage: docforge_cli <file1> [file2] ...
  *
  * Processes documents through the full pipeline:
  *   Capture (mmap) → Preprocess (OpenCV) → OCR (Tesseract) → Extract (rules)
@@ -31,7 +31,7 @@ int main(int argc, char* argv[]) {
         file_start = 3;
     }
 
-    if (!clearcapture::initialize_engine()) {
+    if (!docforge::initialize_engine()) {
         std::cerr << "Failed to initialize engine\n";
         return 1;
     }
@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
 
     std::cout << "[\n";
     for (size_t i = 0; i < files.size(); ++i) {
-        auto result = clearcapture::process_document(files[i], document_type);
+        auto result = docforge::process_document(files[i], document_type);
         if (result.ok) {
             std::cout << "  " << result.value.to_json();
         } else {
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
     }
     std::cout << "]\n";
 
-    clearcapture::shutdown_engine();
+    docforge::shutdown_engine();
 
     return 0;
 }

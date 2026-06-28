@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <cctype>
 
-namespace clearcapture {
+namespace docforge {
 
 // Built-in Rule Sets
 
@@ -175,4 +175,4 @@ std::vector<ExtractedField> RuleExtractor::extract_with_boxes(
     return fields;
 }
 
-} // namespace clearcapture
+} // namespace docforge

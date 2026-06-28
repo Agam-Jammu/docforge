@@ -1,5 +1,5 @@
-using ClearCapture.Api.Data;
-using ClearCapture.Api.Services;
+using DocForge.Api.Data;
+using DocForge.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

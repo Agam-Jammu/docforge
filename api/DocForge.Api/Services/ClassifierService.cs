@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
-namespace ClearCapture.Api.Services;
+namespace DocForge.Api.Services;
 
 /// <summary>
 /// HTTP client wrapper for the Python ML classifier microservice.

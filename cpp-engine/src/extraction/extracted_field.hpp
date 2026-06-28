@@ -5,7 +5,7 @@
 #include <format>
 #include <optional>
 
-namespace clearcapture {
+namespace docforge {
 
 /**
  * @brief Represents the bounding box of a text region in the document image.
@@ -69,4 +69,4 @@ struct DocumentResult {
     }
 };
 
-} // namespace clearcapture
+} // namespace docforge

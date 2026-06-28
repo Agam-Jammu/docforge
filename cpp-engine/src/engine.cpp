@@ -8,7 +8,7 @@
 #include <iostream>
 #include <memory>
 
-namespace clearcapture {
+namespace docforge {
 
 // Global engine state
 static std::unique_ptr<TesseractEngine> g_ocr_engine;
@@ -27,7 +27,7 @@ bool initialize_engine(const std::string& tessdata_path) {
         g_extractor = std::move(extractor);
         g_image_processor = std::move(processor);
 
-        std::cout << std::format("[Engine] ClearCapture C++ engine initialized\n"
+        std::cout << std::format("[Engine] DocForge C++ engine initialized\n"
                                  "  Threads: {}\n"
                                  "  Tesseract: ready\n",
                                  std::thread::hardware_concurrency());
@@ -117,4 +117,4 @@ void shutdown_engine() {
     std::cout << "[Engine] Shutdown complete\n";
 }
 
-} // namespace clearcapture
+} // namespace docforge
