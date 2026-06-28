@@ -7,7 +7,9 @@ namespace ClearCapture.Api.Services;
 
 /// <summary>
 /// Background service that polls for pending documents and processes them
-/// through the C++ engine. This is the IHostedService equivalent of a Windows Service.
+/// through the full pipeline:
+///   C++ Engine (OCR + rule extraction) → Classifier (ML document type) → Save
+/// This is the IHostedService equivalent of a Windows Service.
 /// </summary>
 public class DocumentProcessingService : BackgroundService
 {
@@ -64,6 +66,7 @@ public class DocumentProcessingService : BackgroundService
 
                 _logger.LogInformation("Processing document {Id}: {Filename}", doc.Id, doc.Filename);
 
+                // Step 1: Run the C++ engine (OCR + rule-based extraction)
                 var json = engine.ProcessDocument(doc.RawFilePath!, doc.DocumentType);
 
                 if (json != null)
@@ -71,11 +74,23 @@ public class DocumentProcessingService : BackgroundService
                     var result = JsonSerializer.Deserialize<EngineResult>(json);
                     if (result != null)
                     {
-                        doc.DocumentType = result.DocumentType ?? doc.DocumentType;
-                        doc.Confidence = result.Confidence;
                         doc.RawText = result.RawText;
-                        doc.Status = DocumentStatus.Validated;
 
+                        // Step 2: Run the ML classifier to determine document type
+                        var classifier = scope.ServiceProvider.GetRequiredService<ClassifierService>();
+                        var classifyResult = await classifier.ClassifyAsync(result.RawText ?? "");
+                        if (classifyResult != null)
+                        {
+                            doc.DocumentType = classifyResult.DocumentType;
+                            doc.Confidence = classifyResult.Confidence;
+                        }
+                        else
+                        {
+                            doc.DocumentType = result.DocumentType ?? doc.DocumentType;
+                            doc.Confidence = result.Confidence;
+                        }
+
+                        // If engine returned extracted fields, use them
                         if (result.Fields != null)
                         {
                             foreach (var field in result.Fields)
@@ -90,6 +105,8 @@ public class DocumentProcessingService : BackgroundService
                                 });
                             }
                         }
+
+                        doc.Status = DocumentStatus.Validated;
                     }
                 }
                 else
@@ -110,26 +127,36 @@ public class DocumentProcessingService : BackgroundService
 
     private class EngineResult
     {
-        public string? Filename { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("document_type")]
         public string? DocumentType { get; set; }
-        public double Confidence { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("raw_text")]
         public string? RawText { get; set; }
+        public double Confidence { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("fields")]
         public List<EngineField>? Fields { get; set; }
     }
 
     private class EngineField
     {
+        [System.Text.Json.Serialization.JsonPropertyName("field_name")]
         public string? FieldName { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("value")]
         public string? Value { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("confidence")]
         public double Confidence { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("bounding_box")]
         public BoundingBox? BoundingBox { get; set; }
     }
 
     private class BoundingBox
     {
+        [System.Text.Json.Serialization.JsonPropertyName("x")]
         public int X { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("y")]
         public int Y { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("width")]
         public int Width { get; set; }
+        [System.Text.Json.Serialization.JsonPropertyName("height")]
         public int Height { get; set; }
     }
 }
