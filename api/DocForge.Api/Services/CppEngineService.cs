@@ -45,19 +45,26 @@ public class CppEngineService : IDisposable
 
         if (_cliPath == null)
         {
-            _logger.LogWarning("C++ engine CLI not found — fallback to mock extraction");
+            _logger.LogWarning("C++ engine CLI not found — searched paths: {Paths}",
+                string.Join(", ", possiblePaths));
         }
     }
 
     public string? ProcessDocument(string filePath, string documentType)
     {
-        if (_cliPath != null && File.Exists(filePath))
+        if (_cliPath == null)
         {
-            return ProcessViaCli(filePath, documentType);
+            _logger.LogError("Cannot process document {File}: C++ CLI binary not found", filePath);
+            return null;
         }
 
-        // Fallback to mock if CLI binary isn't found or file doesn't exist
-        return GenerateMockResult(filePath, documentType);
+        if (!File.Exists(filePath))
+        {
+            _logger.LogError("Cannot process document {File}: file does not exist", filePath);
+            return null;
+        }
+
+        return ProcessViaCli(filePath, documentType);
     }
 
     private string? ProcessViaCli(string filePath, string documentType)
@@ -69,7 +76,7 @@ public class CppEngineService : IDisposable
                 FileName = _cliPath,
                 Arguments = $"--type {documentType} \"{filePath}\"",
                 RedirectStandardOutput = true,
-                RedirectStandardError = false,
+                RedirectStandardError = true,
                 UseShellExecute = false,
                 CreateNoWindow = true,
             };
@@ -77,19 +84,34 @@ public class CppEngineService : IDisposable
             using var process = new Process { StartInfo = psi };
             process.Start();
 
-            // Read all stdout — the engine outputs a JSON array
-            var stdout = process.StandardOutput.ReadToEnd();
-            process.WaitForExit(TimeSpan.FromSeconds(30));
+            // Read stdout and stderr concurrently to avoid deadlocks
+            var stdoutTask = process.StandardOutput.ReadToEndAsync();
+            var stderrTask = process.StandardError.ReadToEndAsync();
+
+            if (!process.WaitForExit(TimeSpan.FromSeconds(60)))
+            {
+                _logger.LogWarning("C++ engine CLI timed out after 60s for {File} (type: {Type})", filePath, documentType);
+                process.Kill();
+                return null;
+            }
+
+            var stdout = stdoutTask.Result;
+            var stderr = stderrTask.Result;
 
             if (process.ExitCode != 0)
             {
-                _logger.LogWarning("CLI exited with code {Code} for {File}", process.ExitCode, filePath);
+                _logger.LogWarning("C++ engine CLI exited with code {Code} for {File} (type: {Type}). Stderr: {Stderr}",
+                    process.ExitCode, filePath, documentType, stderr);
                 return null;
+            }
+
+            if (!string.IsNullOrEmpty(stderr))
+            {
+                _logger.LogInformation("C++ engine CLI stderr for {File}: {Stderr}", filePath, stderr);
             }
 
             // Extract the JSON object from the output.
             // The CLI wraps results in an array: [ { ... JSON ... } ]
-            // We need to find the first { and the matching } after removing the array wrapper.
             var jsonStart = stdout.IndexOf('{');
             var jsonEnd = stdout.LastIndexOf('}');
             if (jsonStart >= 0 && jsonEnd > jsonStart)
@@ -100,38 +122,19 @@ public class CppEngineService : IDisposable
                 // Replace literal newlines with \n escape sequences so JsonSerializer can parse it.
                 json = json.Replace("\r\n", "\\n").Replace("\r", "\\n").Replace("\n", "\\n");
 
-                _logger.LogInformation("C++ engine CLI: extracted result for {File}", filePath);
+                _logger.LogInformation("C++ engine CLI: extracted result for {File} (type: {Type})", filePath, documentType);
                 return json;
             }
 
-            _logger.LogWarning("Could not parse CLI output for {File}", filePath);
+            _logger.LogWarning("Could not parse CLI output for {File} (type: {Type}). Stdout: {Stdout}",
+                filePath, documentType, stdout);
             return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to run C++ engine CLI for {File}", filePath);
+            _logger.LogError(ex, "Failed to run C++ engine CLI for {File} (type: {Type})", filePath, documentType);
             return null;
         }
-    }
-
-    private string GenerateMockResult(string filePath, string documentType)
-    {
-        _logger.LogInformation("Generating mock extraction for {File} (type: {Type})", filePath, documentType);
-
-        var fields = @"[
-            {""field_name"":""vendor_name"",""value"":""Acme Corp"",""confidence"":92.0,""bounding_box"":{""x"":30,""y"":70,""width"":200,""height"":20}},
-            {""field_name"":""invoice_number"",""value"":""INV-2026-0042"",""confidence"":88.0,""bounding_box"":{""x"":300,""y"":70,""width"":180,""height"":20}},
-            {""field_name"":""date"",""value"":""2026-06-15"",""confidence"":90.0,""bounding_box"":{""x"":80,""y"":150,""width"":140,""height"":20}},
-            {""field_name"":""total_amount"",""value"":""$1,250.00"",""confidence"":85.0,""bounding_box"":{""x"":30,""y"":360,""width"":120,""height"":20}},
-            {""field_name"":""line_items"",""value"":""Consulting services - 10 hrs @ $125/hr"",""confidence"":75.0,""bounding_box"":{""x"":30,""y"":240,""width"":500,""height"":60}}
-        ]";
-
-        var filename = Path.GetFileName(filePath);
-        var escapedRawText = "INVOICE\\nAcme Corp\\n123 Business Ave\\nINV-2026-0042\\nDate: 2026-06-15\\n\\nItem: Consulting services\\nQty: 10\\nRate: $125.00\\nTotal: $1,250.00\\n\\nThank you for your business!";
-
-        var json = $"{{\"filename\":\"{filename}\",\"document_type\":\"{documentType}\",\"confidence\":85.0,\"page_count\":1,\"raw_text\":\"{escapedRawText}\",\"fields\":{fields}}}";
-        _logger.LogInformation("Generated mock result for {File}, 5 fields", filePath);
-        return json;
     }
 
     public void Dispose()
