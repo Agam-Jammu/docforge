@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-eng \
     libopencv-dev \
-    libpoppler-dev \
+    libpoppler-cpp-dev \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
