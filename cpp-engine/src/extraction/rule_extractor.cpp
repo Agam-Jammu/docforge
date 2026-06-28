@@ -47,12 +47,13 @@ std::unordered_map<std::string, RuleSet> RuleExtractor::builtin_rules() {
     rules["medical_form"] = RuleSet{
         "medical_form",
         {
-            {"patient_name",    R"(Patient[:\s]+(.+))",                                       "header"},
-            {"dob",             R"(DOB[:\s]*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}))",               "header"},
+            {"patient_name",    R"(PATIENT NAME[:\s]+(.+))",                                  "header"},
+            {"date_of_birth",   R"(DATE OF BIRTH[:\s]*(\d{4}-\d{2}-\d{2}))",                  "header"},
+            {"dob_alt",         R"((\d{4}-\d{2}-\d{2}))",                                     "header"},
             {"diagnosis_code",  R"((?:ICD|DX)[:\s]*([A-Z]\d{2}(?:\.\d{1,2})?))",              "body"},
-            {"provider_name",   R"(Provider[:\s]+(.+))",                                       "header"},
-            {"date_of_service", R"(Date of Service[:\s]*(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}))",    "header"},
-            {"insurance_id",    R"(Insurance[:\s]*(?:#|ID)?[:\s]*([A-Z0-9\-]+))",              "header"},
+            {"provider_name",   R"(PHYSICIAN[:\s]+(.+))",                                     "header"},
+            {"insurance",       R"(INSURANCE[:\s]+(.+))",                                     "header"},
+            {"policy_number",   R"(POLICY[:\s]+(.+))",                                        "header"},
         }
     };
 
