@@ -1,5 +1,6 @@
 using ClearCapture.Api.Data;
 using ClearCapture.Api.Models;
+using ClearCapture.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,6 +17,28 @@ public class DocumentsController : ControllerBase
     {
         _db = db;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Get all documents, ordered by most recent upload.
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var docs = await _db.Documents
+            .OrderByDescending(d => d.UploadedAt)
+            .Select(d => new
+            {
+                d.Id,
+                d.Filename,
+                d.DocumentType,
+                Status = d.Status.ToString(),
+                d.Confidence,
+                d.UploadedAt
+            })
+            .ToListAsync();
+
+        return Ok(docs);
     }
 
     /// <summary>
@@ -54,8 +77,36 @@ public class DocumentsController : ControllerBase
 
         return Ok(documents.Select(d => new
         {
-            d.Id, d.Filename, d.Status, d.UploadedAt
+            d.Id, d.Filename, Status = d.Status.ToString(), d.UploadedAt
         }));
+    }
+
+    /// <summary>
+    /// Get all documents (alias for GET /api/documents with status filtering).
+    /// </summary>
+    [HttpGet("status")]
+    public async Task<IActionResult> GetAllByStatus([FromQuery] string? status)
+    {
+        var query = _db.Documents.AsQueryable();
+        if (!string.IsNullOrWhiteSpace(status))
+        {
+            query = query.Where(d => d.Status.ToString() == status);
+        }
+
+        var docs = await query
+            .OrderByDescending(d => d.UploadedAt)
+            .Select(d => new
+            {
+                d.Id,
+                d.Filename,
+                d.DocumentType,
+                Status = d.Status.ToString(),
+                d.Confidence,
+                d.UploadedAt
+            })
+            .ToListAsync();
+
+        return Ok(docs);
     }
 
     /// <summary>
@@ -67,7 +118,7 @@ public class DocumentsController : ControllerBase
         var doc = await _db.Documents.FindAsync(id);
         if (doc == null) return NotFound();
 
-        return Ok(new { doc.Id, doc.Filename, doc.Status, doc.Confidence, doc.DocumentType });
+        return Ok(new { doc.Id, doc.Filename, Status = doc.Status.ToString(), doc.Confidence, doc.DocumentType });
     }
 
     /// <summary>
@@ -82,14 +133,20 @@ public class DocumentsController : ControllerBase
 
         if (doc == null) return NotFound();
 
+        // Derive the stored filename from the raw file path for image display
+        var storedFilename = doc.RawFilePath != null
+            ? Path.GetFileName(doc.RawFilePath)
+            : doc.Filename;
+
         return Ok(new
         {
             doc.Id,
             doc.Filename,
+            storedFilename,
             doc.DocumentType,
             doc.Confidence,
             doc.RawText,
-            doc.Status,
+            Status = doc.Status.ToString(),
             Fields = doc.ExtractedFields.Select(f => new
             {
                 f.Id,
@@ -148,37 +205,16 @@ public class DocumentsController : ControllerBase
 
     /// <summary>
     /// Trigger export for a validated document.
+    /// Delivers to the configured export target (webhook, postgres, or file).
     /// </summary>
     [HttpPost("{id:guid}/export")]
-    public async Task<IActionResult> Export(Guid id)
+    public async Task<IActionResult> Export(Guid id, [FromServices] ExportService exportService)
     {
-        var doc = await _db.Documents
-            .Include(d => d.ExtractedFields)
-            .FirstOrDefaultAsync(d => d.Id == id);
+        var result = await exportService.ExportAsync(id);
+        if (!result.Success)
+            return BadRequest(new { error = result.Error });
 
-        if (doc == null) return NotFound();
-        if (doc.Status != DocumentStatus.Validated)
-            return BadRequest("Document must be validated before export");
-
-        // Get workflow config for this document type
-        var workflow = await _db.WorkflowConfigs
-            .FirstOrDefaultAsync(w => w.DocumentType == doc.DocumentType);
-
-        var destination = workflow?.ExportTarget ?? "json_webhook";
-
-        // Mock export: log it
-        _db.ExportLogs.Add(new ExportLog
-        {
-            DocumentId = id,
-            Destination = destination,
-            Status = "exported",
-            ResponseJson = $"{{\"exported_fields\":{doc.ExtractedFields.Count}}}"
-        });
-
-        doc.Status = DocumentStatus.Exported;
-        await _db.SaveChangesAsync();
-
-        return Ok(new { doc.Id, doc.Status, Destination = destination });
+        return Ok(new { id, status = "exported", destination = result.Destination });
     }
 }
 

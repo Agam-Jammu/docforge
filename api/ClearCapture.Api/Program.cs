@@ -18,6 +18,9 @@ builder.Services.AddHttpClient<ClassifierService>(client =>
     client.Timeout = TimeSpan.FromSeconds(10);
 });
 
+// Export service — handles delivery to configured targets
+builder.Services.AddSingleton<ExportService>();
+
 // Background document processing service
 builder.Services.AddHostedService<DocumentProcessingService>();
 
@@ -42,6 +45,15 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.EnsureCreated();
 }
+
+// Serve uploaded files for the React UI to display document images
+var uploadsDir = Path.Combine(builder.Environment.ContentRootPath, "Uploads");
+Directory.CreateDirectory(uploadsDir);
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsDir),
+    RequestPath = "/uploads"
+});
 
 if (app.Environment.IsDevelopment())
 {
