@@ -28,6 +28,12 @@ builder.Services.AddHostedService<DocumentProcessingService>();
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
+// Increase request body size limit (default ~30MB) to support large document uploads
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = null; // no limit
+});
+
 // CORS for React frontend
 builder.Services.AddCors(options =>
 {

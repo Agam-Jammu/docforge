@@ -29,7 +29,6 @@ export default function DocumentUpload({ onUploadComplete }: DocumentUploadProps
       "image/jpeg": [".jpg", ".jpeg"],
       "image/tiff": [".tiff", ".tif"],
     },
-    maxSize: 50 * 1024 * 1024, // 50MB
   });
 
   const removeFile = (index: number) => {
@@ -71,7 +70,7 @@ export default function DocumentUpload({ onUploadComplete }: DocumentUploadProps
               Drag & drop documents here, or click to browse
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              PDF, PNG, JPEG, TIFF — up to 50MB each
+              PDF, PNG, JPEG, TIFF — no size limit
             </p>
           </div>
         )}
