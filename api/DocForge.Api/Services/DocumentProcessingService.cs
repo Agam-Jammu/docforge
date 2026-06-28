@@ -77,17 +77,31 @@ public class DocumentProcessingService : BackgroundService
                         doc.RawText = result.RawText;
 
                         // Step 2: Run the ML classifier to determine document type
-                        var classifier = scope.ServiceProvider.GetRequiredService<ClassifierService>();
-                        var classifyResult = await classifier.ClassifyAsync(result.RawText ?? "");
-                        if (classifyResult != null)
+                        // Gracefully falls back to the C++ engine's document type if classifier is unreachable
+                        try
                         {
-                            doc.DocumentType = classifyResult.DocumentType;
-                            doc.Confidence = classifyResult.Confidence;
+                            var classifier = scope.ServiceProvider.GetRequiredService<ClassifierService>();
+                            var classifyResult = await classifier.ClassifyAsync(result.RawText ?? "");
+                            if (classifyResult != null)
+                            {
+                                doc.DocumentType = classifyResult.DocumentType;
+                                doc.Confidence = classifyResult.Confidence;
+                            }
+                            else
+                            {
+                                if (!string.IsNullOrEmpty(result.DocumentType))
+                                    doc.DocumentType = result.DocumentType;
+                                if (result.Confidence > 0)
+                                    doc.Confidence = result.Confidence;
+                            }
                         }
-                        else
+                        catch
                         {
-                            doc.DocumentType = result.DocumentType ?? doc.DocumentType;
-                            doc.Confidence = result.Confidence;
+                            _logger.LogWarning("Classifier service unavailable for document {Id}, using engine result", doc.Id);
+                            if (!string.IsNullOrEmpty(result.DocumentType))
+                                doc.DocumentType = result.DocumentType;
+                            if (result.Confidence > 0)
+                                doc.Confidence = result.Confidence;
                         }
 
                         // If engine returned extracted fields, use them
