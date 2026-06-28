@@ -17,9 +17,13 @@ public class CppEngineService : IDisposable
     {
         _logger = logger;
 
-        // Look for the CLI binary relative to the API project directory or the repo root
+        // Look for the CLI binary:
+        // 1. Docker deployment — bundled alongside the API binary
+        // 2. Local dev — compiled in the cpp-engine/build directory
+        // 3. Fallback — try the PATH
         var possiblePaths = new[]
         {
+            Path.Combine(AppContext.BaseDirectory, "docforge_cli"),
             Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "cpp-engine", "build", "docforge_cli"),
             Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "cpp-engine", "build", "docforge_cli"),
             Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "cpp-engine", "build", "docforge_cli"),
