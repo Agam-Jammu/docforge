@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Correction> Corrections => Set<Correction>();
     public DbSet<WorkflowConfig> WorkflowConfigs => Set<WorkflowConfig>();
     public DbSet<ExportLog> ExportLogs => Set<ExportLog>();
+    public DbSet<MockErpOrder> MockErpOrders => Set<MockErpOrder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -54,6 +55,14 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ExportLog>(entity =>
         {
             entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.DocumentId);
+        });
+
+        modelBuilder.Entity<MockErpOrder>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DocumentType).HasMaxLength(100).IsRequired();
+            entity.Property(e => e.Filename).HasMaxLength(500).IsRequired();
             entity.HasIndex(e => e.DocumentId);
         });
     }
