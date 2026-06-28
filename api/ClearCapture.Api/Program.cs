@@ -52,7 +52,11 @@ Directory.CreateDirectory(uploadsDir);
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsDir),
-    RequestPath = "/uploads"
+    RequestPath = "/uploads",
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+    }
 });
 
 if (app.Environment.IsDevelopment())
