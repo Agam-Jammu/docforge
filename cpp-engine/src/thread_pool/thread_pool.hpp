@@ -10,6 +10,7 @@
 #include <queue>
 #include <span>
 #include <stop_token>
+#include <optional>
 #include <thread>
 #include <vector>
 
