@@ -1,6 +1,6 @@
 import type { Document, DocumentDetail, FieldCorrection, WorkflowConfig } from "./types";
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5178/api";
 
 async function apiFetch<T>(
   path: string,
