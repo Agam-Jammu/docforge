@@ -51,8 +51,9 @@ double ImageProcessor::detect_skew_angle(const cv::Mat& binary) {
     std::vector<cv::Point> points;
     cv::findNonZero(binary, points);
 
-    if (points.size() < 10) {
-        return 0.0; // Not enough points to determine skew
+    // If there are very few non-zero pixels, there's nothing to deskew
+    if (points.size() < 100) {
+        return 0.0;
     }
 
     // Fit a line using the least squares method
@@ -63,19 +64,18 @@ double ImageProcessor::detect_skew_angle(const cv::Mat& binary) {
     double angle_rad = std::atan2(line[1], line[0]);
     double angle_deg = angle_rad * 180.0 / std::numbers::pi;
 
-    // Adjust to get the rotation angle (usually small)
-    // For documents, we want the angle that makes text horizontal
-    double skew = 90.0 - std::abs(angle_deg);
-    if (angle_deg < 0) {
-        skew = -skew;
+    // Clamp to reasonable skew range (-45 to +45 degrees)
+    // Any skew beyond 45 degrees is likely a degenerate detection
+    if (std::abs(angle_deg) > 45.0) {
+        angle_deg = 0.0;
     }
 
     // Only correct if skew is significant (> 0.5 degrees)
-    if (std::abs(skew) < 0.5) {
+    if (std::abs(angle_deg) < 0.5) {
         return 0.0;
     }
 
-    return skew;
+    return angle_deg;
 }
 
 cv::Mat ImageProcessor::deskew(const cv::Mat& grayscale) {
@@ -133,16 +133,20 @@ cv::Mat ImageProcessor::full_pipeline(const cv::Mat& input) {
     // Step 1: Convert to grayscale
     cv::Mat gray = to_grayscale(input);
 
-    // Step 2: Denoise
-    cv::Mat clean = denoise(gray);
+    // Step 2: Upscale low-resolution images for better OCR
+    cv::Mat scaled = gray;
+    if (gray.cols < 600 || gray.rows < 400) {
+        double scale = std::max(600.0 / gray.cols, 400.0 / gray.rows);
+        cv::resize(gray, scaled, cv::Size(), scale, scale, cv::INTER_CUBIC);
+    }
 
-    // Step 3: Deskew
-    cv::Mat straight = deskew(clean);
+    // Step 3: Skip deskew, denoise, and binarization — Tesseract handles
+    // its own binarization internally and does better on clean input.
+    // The full pipeline (deskew, denoise, adaptive threshold) is available
+    // for scanned/photographed documents via the dedicated methods above.
+    // For clean digital documents, grayscale + optional upscale is optimal.
 
-    // Step 4: Binarize for OCR
-    cv::Mat binary = binarize(straight);
-
-    return binary;
+    return scaled;
 }
 
 } // namespace clearcapture
